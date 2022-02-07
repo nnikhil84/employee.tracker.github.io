@@ -91,3 +91,108 @@ function listRoles() {
   });
 }
 
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        name: "department",
+        type: "input",
+        message: "Enter the name of the new department!",
+      },
+    ])
+
+    .then(function (response) {
+      db.query(
+        "INSERT INTO department SET ?",
+        {
+          department_name: response.department,
+        },
+        function (err) {
+          if (err) throw err;
+          console.log("The department was created successfully!");
+          listMenu();
+        }
+      );
+    });
+}
+
+function addRole() {
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "Enter the title of new role!",
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "Enter the salary of the new role!",
+      },
+      {
+        name: "department",
+        type: "input",
+        message: "Enter the department ID of the new role!",
+      },
+    ])
+
+    .then(function (response) {
+      db.query(
+        "INSERT INTO role SET ?",
+        {
+          title: response.title,
+          salary: response.salary,
+          department_id: response.department,
+        },
+        function (err) {
+          if (err) throw err;
+          console.log("The new role is created successfully!");
+          listMenu();
+        }
+      );
+    });
+}
+
+function addEmployee() {
+  inquirer
+    .prompt([
+      {
+        name: "firstName",
+        type: "input",
+        message: "Enter the first name of the new employee!",
+      },
+      {
+        name: "lastName",
+        type: "input",
+        message: "Enter the last name of the new employee!",
+      },
+      {
+        name: "employeeRole",
+        type: "input",
+        message: "Enter the role id for the new employee!",
+      },
+      {
+        name: "employeeManager",
+        type: "input",
+        message: "Enter the id of the new employee's manager!",
+      },
+    ])
+
+    .then(function (response) {
+      db.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: response.firstName,
+          last_name: response.lastName,
+          role_id: response.employeeRole,
+          manager_id: response.employeeManager,
+        },
+        function (err) {
+          if (err) throw err;
+          console.log("The new employee is created successfully!");
+          listMenu();
+        }
+      );
+    });
+}
+
