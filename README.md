@@ -20,7 +20,7 @@
 
 ## Walkthrough Gif
 
-![Employee Tracker](./images/employee-tracker.gif)
+![Employee Tracker](/Images/employee-tracker.gif)
 
 ## Link to git hub repository
 
