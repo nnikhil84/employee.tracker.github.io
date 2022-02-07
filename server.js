@@ -61,3 +61,33 @@ function listMenu() {
       }
     });
 }
+function listDepartments() {
+  let query = "SELECT * FROM  department";
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    listMenu();
+  });
+}
+
+function listEmployees() {
+  let query =
+    "SELECT e.id, e.first_name, e.last_name, role.title, department.department_name AS department, role.salary, concat(m.first_name, ' ' ,  m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id INNER JOIN role ON e.role_id = role.id INNER JOIN department ON role.department_id = department.id ORDER BY id ASC";
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    listMenu();
+  });
+}
+
+function listRoles() {
+  let query = `SELECT role.id, role.title, department.department_name AS department, role.salary
+                  FROM role
+                  INNER JOIN department ON role.department_id = department.id`;
+  db.query(query, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    listMenu();
+  });
+}
+
