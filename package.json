@@ -1,0 +1,25 @@
+{
+  "name": "employee.tracker.github.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nnikhil84/employee.tracker.github.io.git"
+  },
+  "author": "Nikhil Nikhil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nnikhil84/employee.tracker.github.io/issues"
+  },
+  "homepage": "https://github.com/nnikhil84/employee.tracker.github.io#readme",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3",
+    "promise-mysql": "^5.1.0"
+  }
+}
