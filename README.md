@@ -22,6 +22,6 @@
 
 ![Employee Tracker](./images/employee-tracker.gif)
 
-## Link of git hub repository
+## Link to git hub repository
 
 https://github.com/nnikhil84/employee.tracker.github.io 
