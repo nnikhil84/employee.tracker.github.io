@@ -196,3 +196,243 @@ function addEmployee() {
     });
 }
 
+function updateEmployeeRole() {
+  let employeeArr = [];
+  let roleArr = [];
+  mysqlpromise
+    .connectDb(dbConnect)
+    .then((conn) => {
+      return Promise.all([
+        conn.query("SELECT id, title FROM role ORDER BY title ASC"),
+        conn.query(
+          "SELECT employee.id, concat(employee.first_name, ' ' ,  employee.last_name) AS Employee FROM employee ORDER BY Employee ASC"
+        ),
+      ]);
+    })
+    .then(([roles, employees]) => {
+      for (i = 0; i < roles[0].length; i++) {
+        roleArr.push(roles[0][i].title);
+      }
+      for (i = 0; i < employees[0].length; i++) {
+        employeeArr.push(employees[0][i].Employee);
+      }
+      return Promise.all([roles[0], employees[0]]);
+    })
+    .then(([roles, employees]) => {
+      inquirer
+        .prompt([
+          {
+            name: "employee",
+            type: "list",
+            message: "Select employee to edit",
+            choices: employeeArr,
+          },
+          {
+            name: "role",
+            type: "list",
+            message: "Select new role pf the employee",
+            choices: roleArr,
+          },
+        ])
+        .then((answer) => {
+          let roleID;
+          let employeeID;
+          for (i = 0; i < roles.length; i++) {
+            if (answer.role == roles[i].title) {
+              roleID = roles[i].id;
+            }
+          }
+          for (i = 0; i < employees.length; i++) {
+            if (answer.employee == employees[i].Employee) {
+              employeeID = employees[i].id;
+            }
+          }
+          db.query(
+            `UPDATE employee SET role_id = ${roleID} WHERE id = ${employeeID}`,
+            (err, res) => {
+              if (err) return err;
+              console.log(
+                `\n ${answer.employee} ROLE UPDATED TO ${answer.role}...\n `
+              );
+              listMenu();
+            }
+          );
+        });
+    });
+}
+
+function deleteEmployee() {
+  let employeeArr = [];
+
+  db.query(
+    "SELECT employee.id, concat(employee.first_name, ' ' ,  employee.last_name) AS employee FROM employee ORDER BY Employee ASC",
+    function (err, res) {
+      for (i = 0; i < res.length; i++) {
+        employeeArr.push(res[i].employee);
+      }
+
+      inquirer
+        .prompt([
+          {
+            name: "employee",
+            type: "list",
+            message: "Select employee to delete!",
+            choices: employeeArr,
+          },
+          {
+            name: "boolean",
+            type: "list",
+            message: "Please select to confirm deletion",
+            choices: ["NO", "YES"],
+          },
+        ])
+        .then((answer) => {
+          if (answer.boolean == "YES") {
+            let employeeID;
+
+            for (i = 0; i < res.length; i++) {
+              if (answer.employee == res[i].employee) {
+                employeeID = res[i].id;
+              }
+            }
+
+            db.query(
+              `DELETE FROM employee WHERE id=${employeeID};`,
+              (err, res) => {
+                if (err) return err;
+                console.log(`\n EMPLOYEE '${answer.employee}' DELETED...\n `);
+                listMenu();
+              }
+            );
+          } else {
+            console.log(`\n EMPLOYEE '${answer.employee}' NOT DELETED...\n `);
+            listMenu();
+          }
+        });
+    }
+  );
+}
+
+function deleteRole() {
+  let roleArr = [];
+  db.query("SELECT role.id, title FROM role", function (err, res) {
+    for (i = 0; i < res.length; i++) {
+      roleArr.push(res[i].title);
+    }
+
+    inquirer
+      .prompt([
+        {
+          name: "deletePrompt",
+          type: "list",
+          message:
+            "------!!!!!! Deleting role will delete all employees associated with the role. Do you want to continue? !!!!!------",
+          choices: ["NO", "YES"],
+        },
+      ])
+      .then((answer) => {
+        if (answer.deletePrompt === "NO") {
+          listMenu();
+        }
+      })
+      .then(() => {
+        inquirer
+          .prompt([
+            {
+              name: "role",
+              type: "list",
+              message: "Select the role to delete!",
+              choices: roleArr,
+            },
+            {
+              name: "deleteConfirmatiom",
+              type: "Input",
+              message: "Type the role to confirm deletion!",
+            },
+          ])
+          .then((answer) => {
+            if (answer.deleteConfirmation === answer.role) {
+              let roleID;
+              for (i = 0; i < res.length; i++) {
+                if (answer.role == res[i].title) {
+                  roleID = res[i].id;
+                }
+              }
+              db.query(`DELETE FROM role WHERE id=${roleID};`, (err, res) => {
+                if (err) return err;
+                console.log(`\n ROLE '${answer.role}' is deleted!\n `);
+                listMenu();
+              });
+            } else {
+              console.log(`\n ROLE '${answer.role}' could not be deleted!\n `);
+              listMenu();
+            }
+          });
+      });
+  });
+}
+
+function deleteDepartment() {
+  let deptArr = [];
+
+  db.query("SELECT id, department_name FROM department", function (err, depts) {
+    for (i = 0; i < depts.length; i++) {
+      deptArr.push(depts[i].department_name);
+    }
+
+    inquirer
+      .prompt([
+        {
+          name: "deletePrompt",
+          type: "list",
+          message:
+            "------!!!!!! Deleting a department will delete all employees associated with the department. Do you want to continue? !!!!!------",
+          choices: ["NO", "YES"],
+        },
+      ])
+      .then((answer) => {
+        if (answer.deletePrompt === "NO") {
+          listMenu();
+        }
+      })
+      .then(() => {
+        inquirer
+          .prompt([
+            {
+              name: "dept",
+              type: "list",
+              message: "Enter the department to be deleted!",
+              choices: deptArr,
+            },
+            {
+              name: "deleteConfirmation",
+              type: "Input",
+              message: "Type the role to confirm deletion!",
+            },
+          ])
+          .then((answer) => {
+            if (answer.confirmDelete === answer.dept) {
+              let deptID;
+              for (i = 0; i < depts.length; i++) {
+                if (answer.dept == depts[i].department_name) {
+                  deptID = depts[i].id;
+                }
+              }
+              db.query(
+                `DELETE FROM department WHERE id=${deptID};`,
+                (err, res) => {
+                  if (err) return err;
+                  console.log(`\n DEPARTMENT '${answer.dept}' is deleted!\n `);
+                  listMenu();
+                }
+              );
+            } else {
+              console.log(
+                `\n DEPARTMENT '${answer.dept}' could not be deleted!\n `
+              );
+              listMenu();
+            }
+          });
+      });
+  });
+}
